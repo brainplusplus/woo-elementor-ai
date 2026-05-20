@@ -28,4 +28,5 @@ test_*.php
 Thumbs.db
 
 # Env
+.env.build
 .env.build.bak

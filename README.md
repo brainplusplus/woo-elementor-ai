@@ -52,7 +52,7 @@ woo-elementor-ai/
 │       └── obfuscate.php
 ├── Makefile                      Build commands
 ├── build.ps1                     PowerShell build script
-├── .env.build                    Build configuration
+├── .env.build.example            Build configuration template
 └── README.md
 ```
 
@@ -72,8 +72,11 @@ woo-elementor-ai/
 
 ```bash
 # Clone the repo
-git clone https://github.com/user/woo-elementor-ai.git
+git clone https://github.com/brainplusplus/woo-elementor-ai.git
 cd woo-elementor-ai
+
+# Copy build config and set your public key
+cp .env.build.example .env.build
 
 # First-time setup (builds Go binary + lints all code)
 make dev-setup
@@ -131,14 +134,17 @@ make dev-setup
 make license-keygen
 # Output: keys/private.key + keys/public.key
 
-# 3. Ambil public key, paste ke .env.build
+# 3. Copy build config template
+cp .env.build.example .env.build
+
+# 4. Ambil public key, paste ke .env.build
 make license-pubkey
 # Output: base64 string → copy ini
 
-# 4. Edit .env.build, isi PUBLIC_KEY dengan output di atas
+# 5. Edit .env.build, isi PUBLIC_KEY dengan output di atas
 # PUBLIC_KEY=yQzF2dGhpcyBpcyBhIGJhc2U2NCBwdWJsaWMga2V5...
 
-# 5. Build plugin ZIP untuk distribusi
+# 6. Build plugin ZIP untuk distribusi
 make build
 # Output: woo-elementor-ai-v1.1.0.zip
 ```
@@ -220,7 +226,7 @@ make license-sign MACHINE=a1b2c3d4e5f67890...
 |---|---|---|---|
 | `private.key` | `woo-ai-licensegen/keys/` | Tanda tangan license | **Hanya kamu** (developer) |
 | `public.key` | `woo-ai-licensegen/keys/` | Generate public key string | **Hanya kamu** (developer) |
-| `PUBLIC_KEY` (di .env.build) | Root `.env.build` | Embed ke plugin saat build | **Hanya kamu** (developer) |
+| `PUBLIC_KEY` (di .env.build) | Root `.env.build` (gitignored, copy dari `.env.build.example`) | Embed ke plugin saat build | **Hanya kamu** (developer) |
 | `Machine Key` | Settings page plugin | Identitas unik per domain | **Customer** |
 | `License Key` | Settings page plugin | Hasil sign dari Machine Key | **Customer** (dari kamu) |
 
@@ -247,7 +253,7 @@ make license-sign MACHINE=a1b2c3d4e5f67890...
 
 | Setting | Description | Default |
 |---|---|---|
-| Max Tokens | Maximum response tokens | `4096` |
+| Max Tokens | Maximum response tokens | `64000` |
 | Temperature | Creativity (0-2) | `0.7` |
 | Chat Max Context | Maximum context window | `8000` |
 
@@ -276,22 +282,25 @@ Place JSON files in `templates/packs/` with this structure:
 
 ## Build Configuration
 
+Copy `.env.build.example` to `.env.build` and configure:
+
+```bash
+cp .env.build.example .env.build
+```
+
 `.env.build` controls the build:
 
 ```ini
 PLUGIN_VERSION=1.1.0
 PUBLIC_KEY=base64_encoded_public_key_here
+OBFUSCATE=true
 ```
 
-To embed the public key:
-
-```bash
-# Get the public key
-make license-pubkey
-
-# Edit .env.build with the key, then build
-make build
-```
+| Variable | Description |
+|---|---|
+| `PLUGIN_VERSION` | Version string embedded in plugin header |
+| `PUBLIC_KEY` | Base64-encoded Ed25519 public key (from `make license-pubkey`) |
+| `OBFUSCATE` | Apply 2-layer PHP obfuscation on build (`true`/`false`) |
 
 ## Architecture
 
