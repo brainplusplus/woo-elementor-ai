@@ -1,0 +1,10 @@
+{
+    "name": "woo-elementor-ai/obfuscator",
+    "description": "Custom PHP obfuscator using nikic/php-parser",
+    "require": {
+        "nikic/php-parser": "^5.0"
+    },
+    "config": {
+        "vendor-dir": "vendor"
+    }
+}

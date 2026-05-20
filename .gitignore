@@ -1,0 +1,31 @@
+# Build output
+dist/
+woo-elementor-ai-v*.zip
+
+# Go binaries
+woo-ai-licensegen/licensegen
+woo-ai-licensegen/licensegen.exe
+woo-ai-licensegen/licensegen-mac
+woo-ai-licensegen/keys/
+
+# Obfuscator vendor (install via composer)
+tools/obfuscator/vendor/
+
+# YAK Pro (optional, install separately)
+tools/yakpro-po/
+
+# Test/dev scripts
+test_*.php
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env.build.bak
