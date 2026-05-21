@@ -11,6 +11,15 @@ class License {
 	const LICENSE_TRANSIENT_TTL = DAY_IN_SECONDS;
 
 	private const PUBLIC_KEY_BASE64 = 'PLACEHOLDER_PUBLIC_KEY';
+	private const REQUIRE_LICENSE   = 'PLACEHOLDER_REQUIRE_LICENSE';
+
+	/**
+	 * Whether license verification is required.
+	 * Set to 'false' in .env.build via build pipeline to bypass licensing.
+	 */
+	public function is_license_required(): bool {
+		return filter_var( self::REQUIRE_LICENSE, FILTER_VALIDATE_BOOLEAN );
+	}
 
 	public function get_machine_key(): string {
 		global $wpdb;
@@ -48,6 +57,11 @@ class License {
 	}
 
 	public function is_licensed(): bool {
+		// Bypass license check when not required (REQUIRED_LICENSE_KEY=false in build)
+		if ( ! $this->is_license_required() ) {
+			return true;
+		}
+
 		$cached = get_transient( self::LICENSE_TRANSIENT_KEY );
 		if ( false !== $cached ) {
 			return '1' === $cached;

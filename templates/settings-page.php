@@ -8,10 +8,12 @@ $machine_key   = $license->get_machine_key();
 $is_licensed   = $license->is_licensed();
 $masked_key    = $license->get_masked_license();
 $license_nonce = wp_create_nonce( 'woo_elementor_ai_license_nonce' );
+$license_required = $license->is_license_required();
 ?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'Woo Elementor AI — Settings', 'woo-elementor-ai' ); ?></h1>
 
+	<?php if ( $license_required ) : ?>
 	<div class="woo-ai-license-section" style="background:#f9f9f9;border:1px solid #ddd;padding:20px;margin-bottom:20px;border-radius:4px;">
 		<h2 style="margin-top:0;">
 			<?php if ( $is_licensed ) : ?>
@@ -69,12 +71,6 @@ $license_nonce = wp_create_nonce( 'woo_elementor_ai_license_nonce' );
 		</table>
 	</div>
 
-	<?php if ( ! $is_licensed ) : ?>
-		<div class="notice notice-warning inline" style="margin-bottom:20px;">
-			<p><strong><?php esc_html_e( 'Plugin functionality is locked until license is activated.', 'woo-elementor-ai' ); ?></strong></p>
-		</div>
-	</div>
-
 	<script>
 	function wooAiCopyMachineKey() {
 		var field = document.getElementById('woo_ai_machine_key');
@@ -121,7 +117,14 @@ $license_nonce = wp_create_nonce( 'woo_elementor_ai_license_nonce' );
 	}
 	</script>
 
+	<?php if ( ! $is_licensed ) : ?>
+		<div class="notice notice-warning inline" style="margin-bottom:20px;">
+			<p><strong><?php esc_html_e( 'Plugin functionality is locked until license is activated.', 'woo-elementor-ai' ); ?></strong></p>
+		</div>
+	</div>
+
 	<?php return; ?>
+	<?php endif; ?>
 	<?php endif; ?>
 
 	<form method="post" action="options.php">

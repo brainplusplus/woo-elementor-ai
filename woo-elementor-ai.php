@@ -3,8 +3,8 @@
  * Plugin Name: Woo Elementor AI
  * Plugin URI:  https://github.com/brainplusplus/woo-elementor-ai
  * Description: AI-powered page generation, editing, and chat for Elementor using OpenAI-compatible APIs with flexible image generation support.
- * Version:     1.1.0
- * Author:      Developer
+ * Version:     1.2.0
+ * Author:      Muhammad Tri Wibowo
  * Text Domain: woo-elementor-ai
  * Domain Path: /languages
  * License:     GPL-2.0+
@@ -16,7 +16,7 @@ if (!defined("ABSPATH")) {
     exit();
 }
 
-define("WOO_ELEMENTOR_AI_VERSION", "1.1.0");
+define("WOO_ELEMENTOR_AI_VERSION", "1.2.0");
 define("WOO_ELEMENTOR_AI_PLUGIN_DIR", plugin_dir_path(__FILE__));
 define("WOO_ELEMENTOR_AI_PLUGIN_URL", plugin_dir_url(__FILE__));
 define("WOO_ELEMENTOR_AI_PLUGIN_BASENAME", plugin_basename(__FILE__));

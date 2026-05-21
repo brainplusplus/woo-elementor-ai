@@ -75,6 +75,14 @@ if ($ENV_PUBLIC_KEY) {
     Write-Host "Public key embedded." -ForegroundColor Green
 }
 
+# Embed require license setting
+$requireLicense = if ($ENV_REQUIRED_LICENSE_KEY) { $ENV_REQUIRED_LICENSE_KEY } else { 'true' }
+$licenseFile = Join-Path $DistDir "includes\class-license.php"
+$licenseContent = Get-Content $licenseFile -Raw
+$licenseContent = $licenseContent -replace "PLACEHOLDER_REQUIRE_LICENSE", $requireLicense
+Set-Content $licenseFile $licenseContent -NoNewline
+Write-Host "Required license: $requireLicense" -ForegroundColor Green
+
 # Obfuscation (6-layer pipeline: rename → encrypt strings → goto flow → dead code → eval wrap → integrity)
 if (-not $SkipObfuscate) {
     $customScript = Join-Path $PSScriptRoot "tools\obfuscator\obfuscate.php"

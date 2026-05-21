@@ -291,16 +291,18 @@ cp .env.build.example .env.build
 `.env.build` controls the build:
 
 ```ini
-PLUGIN_VERSION=1.1.0
+PLUGIN_VERSION=1.2.0
 PUBLIC_KEY=base64_encoded_public_key_here
+REQUIRED_LICENSE_KEY=false
 OBFUSCATE=true
 ```
 
-| Variable | Description |
-|---|---|
-| `PLUGIN_VERSION` | Version string embedded in plugin header |
-| `PUBLIC_KEY` | Base64-encoded Ed25519 public key (from `make license-pubkey`) |
-| `OBFUSCATE` | Apply 2-layer PHP obfuscation on build (`true`/`false`) |
+| Variable | Description | Default |
+|---|---|---|
+| `PLUGIN_VERSION` | Version string embedded in plugin header | `1.2.0` |
+| `PUBLIC_KEY` | Base64-encoded Ed25519 public key (from `make license-pubkey`) | — |
+| `REQUIRED_LICENSE_KEY` | Require license activation (`true`/`false`). Set `false` to skip licensing entirely | `false` |
+| `OBFUSCATE` | Apply 2-layer PHP obfuscation on build (`true`/`false`) | `true` |
 
 ## Architecture
 
@@ -388,6 +390,11 @@ tools/obfuscator/
 See [`woo-ai-licensegen/README.md`](woo-ai-licensegen/README.md) for full Go CLI tool documentation.
 
 ## Changelog
+
+### 1.2.0
+- Added: `REQUIRED_LICENSE_KEY` build config — set `false` to skip license activation entirely
+- Changed: Settings page hides license section when `REQUIRED_LICENSE_KEY=false`
+- Changed: Plugin unlocks all features without license when `REQUIRED_LICENSE_KEY=false`
 
 ### 1.1.0
 - Added: License system with domain-bound Ed25519 verification
