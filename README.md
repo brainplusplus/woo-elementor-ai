@@ -338,56 +338,94 @@ Template JSON → Template_Library → Template_Exporter → ZIP
                                                     │   └── manifest.json
 ```
 
-## Code Obfuscation
+## Selling This Plugin (Commercial Licensing)
 
-The build pipeline applies **2-layer PHP obfuscation** to protect sensitive files (`class-license.php`, `class-settings.php`, `class-ai-service.php`) in distribution builds.
+This project includes everything you need to sell the plugin commercially — license system, code obfuscation, and a per-customer signing workflow.
 
-### Layer 1: Scramble (`tools/obfuscator/layer1-scramble.php`)
+### How It Works
+
+When `REQUIRED_LICENSE_KEY=true` in `.env.build`, the plugin **locks all features** until the customer activates a valid license key. Each license is cryptographically bound to the customer's domain (Ed25519 signature), so keys cannot be shared or reused on another site.
+
+### Workflow
+
+```
+YOU (Developer)                          CUSTOMER
+─────────────────                        ─────────
+
+1. make license-keygen (once)
+   → keys/private.key  (KEEP SECRET)
+   → keys/public.key
+
+2. Edit .env.build:
+   REQUIRED_LICENSE_KEY=true
+   PUBLIC_KEY=<from make license-pubkey>
+   OBFUSCATE=true
+
+3. make build → ZIP
+   → Send ZIP to customer
+
+                                         4. Upload & activate plugin
+                                            → Settings shows Machine Key
+
+                                         5. Sends you Machine Key
+
+6. make license-sign MACHINE=<key>
+   → Send License Key back
+
+                                         7. Paste License Key → Activate
+                                            ✅ Plugin fully unlocked
+```
+
+### What Protects Your Code
+
+| Protection | Purpose |
+|---|---|
+| **Ed25519 License** | Domain-bound key. Customer cannot use same key on another site. Verification is offline (no call-home server needed). |
+| **PHP Obfuscation** | Build pipeline applies 2-layer obfuscation (scramble + structural transform) to sensitive files (`class-license.php`, `class-settings.php`, `class-ai-service.php`). Removes comments, encodes strings, injects dead code, shuffles methods — makes reverse engineering impractical. |
+| **`REQUIRED_LICENSE_KEY`** | Embedded at build time. When `true`, all plugin features are locked behind license activation. When `false`, plugin works without any license (open-source / free distribution). |
+
+### Quick Start: Enable Commercial Licensing
+
+```bash
+# 1. Generate keypair (run once)
+make license-keygen
+
+# 2. Get public key
+make license-pubkey
+# → copy the base64 string
+
+# 3. Edit .env.build
+#    REQUIRED_LICENSE_KEY=true
+#    PUBLIC_KEY=<paste from step 2>
+#    OBFUSCATE=true
+
+# 4. Build distribution ZIP
+make build
+# → woo-elementor-ai-v1.2.0.zip (obfuscated, license-gated)
+
+# 5. For each customer:
+make license-sign MACHINE=<customer_machine_key>
+# → send the output back to customer
+```
+
+### Obfuscation Details
+
+The build pipeline applies **multi-layer PHP obfuscation** via [nikic/php-parser v5](https://github.com/nikic/PHP-Parser) AST-level transformations:
 
 - **Comment stripping** — removes all PHPDoc and inline comments
-- **String encoding** — encodes string literals as `hex2bin('...')` (skips class constants and property defaults which require constant expressions)
-- **Junk method injection** — adds 2 private dead-code methods per class with random concat operations
+- **String encoding** — encodes string literals as `hex2bin('...')`
+- **Junk injection** — adds dead-code methods and properties with random operations
+- **Method shuffling** — randomizes class member order
+- Output is always syntactically valid PHP
 
-### Layer 2: Structural Transform (`tools/obfuscator/layer2-transform.php`)
-
-- **Junk property injection** — adds 1 private property per class with random integer value
-- **Junk method injection** — adds 2 private methods per class with XOR/strlen operations
-- **Method shuffling** — randomizes class member order (preserves constant declarations first)
-
-### Pipeline
-
-```
-Source PHP → Layer 1 (scramble) → Layer 2 (structural) → Obfuscated PHP
-```
-
-Both layers use [nikic/php-parser v5](https://github.com/nikic/PHP-Parser) for AST-level transformations, ensuring the output is always syntactically valid PHP.
-
-### Setup
-
+Setup:
 ```bash
-cd tools/obfuscator
-composer install
+cd tools/obfuscator && composer install
 ```
 
-### Test
+### License Key Generator
 
-```bash
-make obfuscate-test
-```
-
-### Architecture
-
-```
-tools/obfuscator/
-├── composer.json          nikic/php-parser v5
-├── obfuscate.php          Orchestrator (layer1 → layer2)
-├── layer1-scramble.php    Comment strip + hex2bin encode + junk methods
-└── layer2-transform.php   Junk properties + junk methods + shuffle
-```
-
-## License Key Generator
-
-See [`woo-ai-licensegen/README.md`](woo-ai-licensegen/README.md) for full Go CLI tool documentation.
+See [`woo-ai-licensegen/README.md`](woo-ai-licensegen/README.md) for the Go CLI tool that generates keypairs and signs machine keys.
 
 ## Changelog
 
